@@ -1,0 +1,37 @@
+from datasets import load_dataset
+import csv
+from pathlib import Path
+
+def main():
+    repositories = load_dataset("hao-li/AIDev", "all_repository", split="train")
+
+    project_root = Path(__file__).resolve().parents[1]
+
+    csv_dir = project_root / "csv"
+    csv_dir.mkdir(exist_ok=True)
+
+    output_path = csv_dir / "repositories.csv"
+
+    fieldnames = [
+        "REPOID",
+        "LANG",
+        "STARS",
+        "REPOURL",
+    ]
+
+    with output_path.open("w", newline='', encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for row in repositories:
+            writer.writerow({
+                "REPOID": row.get("id", ""),
+                "LANG": row.get("language", ""),
+                "STARS": row.get("stars", ""),
+                "REPOURL": row.get("url", ""),
+            })
+
+    print(f"Repositories CSV file written to {output_path}")
+
+if __name__ == "__main__":
+    main()
